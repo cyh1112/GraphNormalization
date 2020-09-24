@@ -37,18 +37,21 @@
 
 <br>
 
-## 8. Reference 
+## 4. Reference 
 
-[ArXiv's paper](https://arxiv.org/pdf/2003.00982.pdf)
+[ArXiv's paper](https://arxiv.org/pdf/??)
 ```
 @article{dwivedi2020benchmarkgnns,
-  title={Benchmarking Graph Neural Networks},
-  author={Dwivedi, Vijay Prakash and Joshi, Chaitanya K and Laurent, Thomas and Bengio, Yoshua and Bresson, Xavier},
-  journal={arXiv preprint arXiv:2003.00982},
+  title={Learning Graph Normalization For Graph Neural Networks},
+  author={Yihao Chen, Xin Tang, Xianbiao Qi, Chun-Guang Li, Rong Xiao},
+  journal={arXiv preprint arXiv:{??}},
   year={2020}
 }
 ```
-
-
-
 <br><br><br>
+
+### License
+This project is licensed under the MIT License. See LICENSE for more details.
+
+
+
