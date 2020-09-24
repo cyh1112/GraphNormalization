@@ -1,3 +1,0 @@
-epoch:0, loss: 1.0651922997974215, other:0.37, company:0.16, address:0.76, date:0.00, total:0.00
-epoch:1, loss: 0.6322301785151164, other:0.47, company:0.01, address:0.98, date:0.00, total:0.00
-epoch:2, loss: 0.5174161607310885, other:0.56, company:0.00, address:0.98, date:0.00, total:0.00
