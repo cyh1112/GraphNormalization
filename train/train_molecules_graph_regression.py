@@ -17,7 +17,7 @@ def train_epoch_sparse(model, optimizer, device, data_loader, epoch):
     epoch_train_mae = 0
     nb_data = 0
     gpu_mem = 0
-    for iter, (batch_graphs, batch_targets) in enumerate(data_loader):
+    for iter, (batch_graphs, batch_targets, batch_node_size, batch_edge_size) in enumerate(data_loader):
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
         batch_e = batch_graphs.edata['feat'].to(device)
         batch_targets = batch_targets.to(device)
@@ -29,7 +29,7 @@ def train_epoch_sparse(model, optimizer, device, data_loader, epoch):
             batch_pos_enc = batch_pos_enc * sign_flip.unsqueeze(0)
             batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_pos_enc)
         except:
-            batch_scores = model.forward(batch_graphs, batch_x, batch_e)
+            batch_scores = model.forward(batch_graphs, batch_x, batch_e, node_size=batch_node_size, edge_size=batch_edge_size)
         loss = model.loss(batch_scores, batch_targets)
         loss.backward()
         optimizer.step()
@@ -47,7 +47,7 @@ def evaluate_network_sparse(model, device, data_loader, epoch):
     epoch_test_mae = 0
     nb_data = 0
     with torch.no_grad():
-        for iter, (batch_graphs, batch_targets) in enumerate(data_loader):
+        for iter, (batch_graphs, batch_targets, batch_node_size, batch_edge_size) in enumerate(data_loader):
             batch_x = batch_graphs.ndata['feat'].to(device)
             batch_e = batch_graphs.edata['feat'].to(device)
             batch_targets = batch_targets.to(device)
@@ -55,7 +55,7 @@ def evaluate_network_sparse(model, device, data_loader, epoch):
                 batch_pos_enc = batch_graphs.ndata['pos_enc'].to(device)
                 batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_pos_enc)
             except:
-                batch_scores = model.forward(batch_graphs, batch_x, batch_e)
+                batch_scores = model.forward(batch_graphs, batch_x, batch_e, node_size=batch_node_size, edge_size=batch_edge_size)
             loss = model.loss(batch_scores, batch_targets)
             epoch_test_loss += loss.detach().item()
             epoch_test_mae += MAE(batch_scores, batch_targets)
