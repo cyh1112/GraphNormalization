@@ -37,13 +37,13 @@
 
 <br>
 
-$$ 4. SROIE
+## 4. SROIE
 ### train
 ```
 cd sroie
 python train.py
 ```
-###data 
+### data 
 We will release the data soon
 
 ## 5. Reference 
