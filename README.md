@@ -37,7 +37,16 @@
 
 <br>
 
-## 4. Reference 
+$$ 4. SROIE
+### train
+```
+cd sroie
+python train.py
+```
+###data 
+We will release the data soon
+
+## 5. Reference 
 
 [ArXiv's paper](https://arxiv.org/pdf/??)
 ```
