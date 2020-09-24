@@ -1,0 +1,14 @@
+epoch:0, loss: 1.0823289118235624, other:0.57, company:0.00, address:0.44, date:0.00, total:0.42
+epoch:1, loss: 0.8193887064728556, other:0.54, company:0.00, address:0.42, date:0.00, total:0.41
+epoch:2, loss: 0.8711075929901267, other:0.56, company:0.00, address:0.70, date:0.00, total:0.40
+epoch:3, loss: 0.6851348944857151, other:0.69, company:0.00, address:0.82, date:0.00, total:0.28
+epoch:4, loss: 0.4825634628157072, other:0.74, company:0.00, address:0.91, date:0.00, total:0.15
+epoch:5, loss: 0.40683910627908343, other:0.63, company:0.00, address:0.95, date:0.10, total:0.32
+epoch:6, loss: 0.37681812877896464, other:0.78, company:0.00, address:0.84, date:0.20, total:0.10
+epoch:7, loss: 0.37666915866393075, other:0.71, company:0.00, address:0.71, date:0.43, total:0.14
+epoch:8, loss: 0.35796127119396304, other:0.68, company:0.00, address:0.85, date:0.36, total:0.18
+epoch:9, loss: 0.3987995476662358, other:0.70, company:0.00, address:0.85, date:0.29, total:0.10
+epoch:10, loss: 0.4134618636173538, other:0.73, company:0.00, address:0.56, date:0.51, total:0.12
+epoch:11, loss: 0.4468234966072855, other:0.63, company:0.00, address:0.98, date:0.10, total:0.05
+epoch:12, loss: 0.3878807915916926, other:0.70, company:0.00, address:0.94, date:0.25, total:0.08
+epoch:13, loss: 0.3730939153251769, other:0.66, company:0.04, address:0.83, date:0.52, total:0.09
