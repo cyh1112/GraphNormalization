@@ -286,6 +286,7 @@ def main():
     parser.add_argument('--dropout', help="Please give a value for dropout")
     parser.add_argument('--layer_norm', help="Please give a value for layer_norm")
     parser.add_argument('--batch_norm', help="Please give a value for batch_norm")
+    parser.add_argument('--norm', help="Please give a value for norm")
     parser.add_argument('--sage_aggregator', help="Please give a value for sage_aggregator")
     parser.add_argument('--data_mode', help="Please give a value for data_mode")
     parser.add_argument('--num_pool', help="Please give a value for num_pool")
@@ -374,6 +375,8 @@ def main():
         net_params['layer_norm'] = True if args.layer_norm=='True' else False
     if args.batch_norm is not None:
         net_params['batch_norm'] = True if args.batch_norm=='True' else False
+    if args.norm is not None:
+        net_params['norm'] = args.norm
     if args.sage_aggregator is not None:
         net_params['sage_aggregator'] = args.sage_aggregator
     if args.data_mode is not None:
