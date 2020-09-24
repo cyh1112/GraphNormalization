@@ -25,7 +25,7 @@ class GATNet(nn.Module):
         dropout = net_params['dropout']
         n_layers = net_params['L']
         self.readout = net_params['readout']
-        self.batch_norm = net_params['batch_norm']
+        self.norm = net_params['norm']
         self.residual = net_params['residual']
         self.dropout = dropout
         self.n_classes = n_classes
@@ -47,24 +47,24 @@ class GATNet(nn.Module):
         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
         
         self.layers = nn.ModuleList([self.layer_type(hidden_dim * num_heads, hidden_dim, num_heads,
-                                                     dropout, self.batch_norm, self.residual) for _ in range(n_layers-1)])
-        self.layers.append(self.layer_type(hidden_dim * num_heads, out_dim, 1, dropout, self.batch_norm, self.residual))
+                                                     dropout, self.norm, self.residual) for _ in range(n_layers-1)])
+        self.layers.append(self.layer_type(hidden_dim * num_heads, out_dim, 1, dropout, self.norm, self.residual))
         self.MLP_layer = MLPReadout(2*out_dim, n_classes)
         
-    def forward(self, g, h, e):
+    def forward(self, g, h, e, node_size=None, edge_size=None):
         h = self.embedding_h(h.float())
         h = self.in_feat_dropout(h)
         
         if self.layer_type == GATLayer:
             for conv in self.layers:
-                h = conv(g, h)
+                h = conv(g, h, node_size=node_size, edge_size=edge_size)
         else:
             if not self.edge_feat:
                 e = torch.ones_like(e).to(self.device)
             e = self.embedding_e(e.float())
             
             for conv in self.layers:
-                h, e = conv(g, h, e)
+                h, e = conv(g, h, e, node_size=node_size, edge_size=edge_size)
         
         g.ndata['h'] = h
         

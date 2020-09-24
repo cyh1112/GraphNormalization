@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import dgl
+from norm.norm import LoadNorm, normalize
 
 """
     ResGatedGCN: Residual Gated Graph ConvNets
@@ -12,12 +14,12 @@ class GatedGCNLayer(nn.Module):
     """
         Param: []
     """
-    def __init__(self, input_dim, output_dim, dropout, batch_norm, residual=False):
+    def __init__(self, input_dim, output_dim, dropout, norm, residual=False):
         super().__init__()
         self.in_channels = input_dim
         self.out_channels = output_dim
         self.dropout = dropout
-        self.batch_norm = batch_norm
+        self.norm = norm
         self.residual = residual
         
         if input_dim != output_dim:
@@ -28,8 +30,9 @@ class GatedGCNLayer(nn.Module):
         self.C = nn.Linear(input_dim, output_dim, bias=True)
         self.D = nn.Linear(input_dim, output_dim, bias=True)
         self.E = nn.Linear(input_dim, output_dim, bias=True)
-        self.bn_node_h = nn.BatchNorm1d(output_dim)
-        self.bn_node_e = nn.BatchNorm1d(output_dim)
+
+        self.bn_node_h = LoadNorm(self.norm, output_dim, is_node=True)
+        self.bn_node_e = LoadNorm(self.norm, output_dim, is_node=False)
 
     def message_func(self, edges):
         Bh_j = edges.src['Bh']    
@@ -41,12 +44,13 @@ class GatedGCNLayer(nn.Module):
         Ah_i = nodes.data['Ah']
         Bh_j = nodes.mailbox['Bh_j']
         e = nodes.mailbox['e_ij'] 
+        
         sigma_ij = torch.sigmoid(e) # sigma_ij = sigmoid(e_ij)
-        #h = Ah_i + torch.mean( sigma_ij * Bh_j, dim=1 ) # hi = Ahi + mean_j alpha_ij * Bhj 
+        #h = Ah_i + torch.mean( sigma_ij * Bh_j, dim=1 ) # hi = Ahi + mean_j alpha_ij * Bhj
         h = Ah_i + torch.sum( sigma_ij * Bh_j, dim=1 ) / ( torch.sum( sigma_ij, dim=1 ) + 1e-6 )  # hi = Ahi + sum_j eta_ij/sum_j' eta_ij' * Bhj <= dense attention       
         return {'h' : h}
     
-    def forward(self, g, h, e):
+    def forward(self, g, h, e, node_size=None, edge_size=None):
         
         h_in = h # for residual connection
         e_in = e # for residual connection
@@ -58,13 +62,15 @@ class GatedGCNLayer(nn.Module):
         g.ndata['Eh'] = self.E(h) 
         g.edata['e']  = e 
         g.edata['Ce'] = self.C(e) 
+
         g.update_all(self.message_func,self.reduce_func) 
+        
         h = g.ndata['h'] # result of graph convolution
         e = g.edata['e'] # result of graph convolution
-        
-        if self.batch_norm:
-            h = self.bn_node_h(h) # batch normalization  
-            e = self.bn_node_e(e) # batch normalization  
+
+        if self.norm is not None:
+            normalize(self.bn_node_h, h, g, node_size)
+            normalize(self.bn_node_e, e, g, edge_size)
         
         h = F.relu(h) # non-linear activation
         e = F.relu(e) # non-linear activation
@@ -77,12 +83,11 @@ class GatedGCNLayer(nn.Module):
         e = F.dropout(e, self.dropout, training=self.training)
         
         return h, e
-    
+
     def __repr__(self):
         return '{}(in_channels={}, out_channels={})'.format(self.__class__.__name__,
-                                             self.in_channels,
-                                             self.out_channels)
-
+                                                            self.in_channels,
+                                                            self.out_channels)
     
 ##############################################################
 #

@@ -32,27 +32,27 @@ class GATLayer(nn.Module):
     Using dgl builtin GATConv by default:
     https://github.com/graphdeeplearning/benchmarking-gnns/commit/206e888ecc0f8d941c54e061d5dffcc7ae2142fc
     """    
-    def __init__(self, in_dim, out_dim, num_heads, dropout, batch_norm, residual=False, activation=F.elu):
+    def __init__(self, in_dim, out_dim, num_heads, dropout, norm, residual=False, activation=F.elu):
         super().__init__()
         self.residual = residual
         self.activation = activation
-        self.batch_norm = batch_norm
+        self.norm = norm
             
         if in_dim != (out_dim*num_heads):
             self.residual = False
 
         self.gatconv = GATConv(in_dim, out_dim, num_heads, dropout, dropout)
 
-        if self.batch_norm:
-            self.batchnorm_h = nn.BatchNorm1d(out_dim * num_heads)
+        self.batchnorm_h = LoadNorm(self.norm, out_dim * num_heads, is_node=True)
 
-    def forward(self, g, h):
+
+    def forward(self, g, h, node_size=None, edge_size=None):
         h_in = h # for residual connection
 
         h = self.gatconv(g, h).flatten(1)
             
-        if self.batch_norm:
-            h = self.batchnorm_h(h)
+        if self.norm is not None:
+            normalize(self.batchnorm_h, h, g, node_size)
             
         if self.activation:
             h = self.activation(h)

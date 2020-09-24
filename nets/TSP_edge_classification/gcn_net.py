@@ -36,11 +36,11 @@ class GCNNet(nn.Module):
         self.layers.append(GCNLayer(hidden_dim, out_dim, F.relu, dropout, self.batch_norm, self.residual))
         self.MLP_layer = MLPReadout(2*out_dim, n_classes)        
 
-    def forward(self, g, h, e):
+    def forward(self, g, h, e, node_size=None, edge_size=None):
         h = self.embedding_h(h.float())
         h = self.in_feat_dropout(h)
         for conv in self.layers:
-            h = conv(g, h)
+            h = conv(g, h, node_size=node_size, edge_size=edge_size)
         g.ndata['h'] = h
         
         def _edge_feat(edges):
