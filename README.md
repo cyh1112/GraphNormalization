@@ -50,7 +50,7 @@ We will release the data soon
 
 [ArXiv's paper](https://arxiv.org/abs/2009.11746.pdf)
 ```
-@article{dwivedi2020benchmarkgnns,
+@article{graphnormalization,
   title={Learning Graph Normalization For Graph Neural Networks},
   author={Yihao Chen, Xin Tang, Xianbiao Qi, Chun-Guang Li, Rong Xiao},
   journal={arXiv preprint arXiv:{2009.11746}},
