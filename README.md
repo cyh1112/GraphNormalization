@@ -50,11 +50,13 @@ We will release the data soon
 
 [ArXiv's paper](https://arxiv.org/abs/2009.11746.pdf)
 ```
-@article{graphnormalization,
-  title={Learning Graph Normalization For Graph Neural Networks},
-  author={Yihao Chen, Xin Tang, Xianbiao Qi, Chun-Guang Li, Rong Xiao},
-  journal={arXiv preprint arXiv:{2009.11746}},
-  year={2020}
+@misc{chen2020learning,
+    title={Learning Graph Normalization for Graph Neural Networks},
+    author={Yihao Chen and Xin Tang and Xianbiao Qi and Chun-Guang Li and Rong Xiao},
+    year={2020},
+    eprint={2009.11746},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
 }
 ```
 <br><br><br>
