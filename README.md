@@ -44,7 +44,7 @@ cd sroie
 python train.py
 ```
 ### data 
-We will release the data soon
+dropbox: https://www.dropbox.com/s/v1aywni6ch135nb/sroie.tar.gz?dl=0
 
 ## 5. Reference 
 
