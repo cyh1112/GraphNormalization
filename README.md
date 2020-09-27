@@ -6,7 +6,7 @@
 
 **note2**: For some business reasons, the released code may be a little different from our original code. If you find any problem, feel free to contact us.
 
-<img src="./docs/graph_norm.png" width="550"/>
+<img src="./docs/graph_norm.png" align="center" width="750"/>
 
 ## 1. Benchmark initialization
 
