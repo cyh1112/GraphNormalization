@@ -61,7 +61,7 @@ For a receipt, each text bbox can be viewed as a node of a graph. Its positions,
 
 #### Dataset
 
-SROIE Dataset Download: [Dropbox](https://www.dropbox.com/s/v1aywni6ch135nb/sroie.tar.gz?dl=0), [BaiduPan: 79zj](https://pan.baidu.com/s/1bGV5wshK2ixFdlDolTzBkA)
+SROIE Dataset Download: [Dropbox](https://www.dropbox.com/s/v1aywni6ch135nb/sroie.tar.gz?dl=0), [BaiduPan: u4tm](https://pan.baidu.com/s/1owQJsZ1EjKqk3D65sX6SQg)
 
 #### Train
 
