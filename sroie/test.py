@@ -109,7 +109,6 @@ def load_data(annotation_file):
                 continue
                 
             edata = []
-            # import pdb; pdb.set_trace()
             #y distance
             y_distance = np.mean(boxes[i][:8][1::2]) - np.mean(boxes[j][:8][1::2])
             x_distance = np.mean(boxes[i][:8][0::2]) - np.mean(boxes[j][:8][0::2])
@@ -145,11 +144,7 @@ def load_data(annotation_file):
     tab_snorm_e = torch.FloatTensor(tab_sizes_e, 1).fill_(1./float(tab_sizes_e))
     snorm_e = tab_snorm_e.sqrt()
 
-    # import pdb; pdb.set_trace()
-
     max_length = text_lengths.max()
-
-    # texts = np.concatenate(text)
     new_text = [np.expand_dims(np.pad(t, (0, max_length - t.shape[0]), 'constant'), axis=0) for t in text]
     texts = np.concatenate(new_text)
 
@@ -173,7 +168,7 @@ def load_gate_gcn_net(device, checkpoint_path):
     net_params['n_classes'] = 5
     net_params['in_feat_dropout'] = 0.1
     net_params['dropout'] = 0.0
-    net_params['L'] = 6
+    net_params['L'] = 8
     net_params['readout'] = True
     net_params['graph_norm'] = True
     net_params['batch_norm'] = True
@@ -195,20 +190,18 @@ node_labels = ['other', 'company', 'address', 'date', 'total']
 alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ%[](){}<>&+=\'"!?~:/-@*_.,;·|#$\\^ '
 
 def main():
-
-    checkpoint_path = './checkpoints/bn_bn_1.0_newest.pkl'
+    data_path = "./test/"
+    image_path = "./test_image/"
+    checkpoint_path = './checkpoints/test_newest.pkl'
     device = 'cuda'
     model = load_gate_gcn_net(device, checkpoint_path)
 
     acc_right  = [0, 0, 0, 0]
-    # data_path = "/data/yihao/src/MyLearning/graph/benchmarking-gnns/data/SROIE2019/filter_data_4"
-    data_path = "/data/yihao/src/MyLearning/graph/benchmarking-gnns/data/SROIE2019/new_test_2"
     annotation_list = os.listdir(data_path)
 
     for annotation_file in annotation_list:
         if 'jpg' in annotation_file:
             continue
-        # annotation_file = 'X51005719857.txt'
         annotation_path = os.path.join(data_path, annotation_file)
         batch_graphs, batch_labels, batch_x, batch_e, batch_snorm_n, batch_snorm_e, text, text_length, boxes, ann_file, graph_node_size, graph_edge_size = load_data(annotation_path)
 
@@ -220,21 +213,14 @@ def main():
         batch_snorm_e = batch_snorm_e.to(device)
         batch_snorm_n = batch_snorm_n.to(device)         # num x 1
 
-        batch_scores = model.forward(batch_graphs, batch_x, batch_e, text, text_length, batch_snorm_n, batch_snorm_e, graph_node_size, graph_edge_size)
-        _, _, acc = accuracy(batch_scores, batch_labels)
+        batch_scores = model.forward(batch_graphs, batch_x, batch_e, text, text_length, batch_snorm_n, batch_snorm_e)
 
-        for i in range(1, len(acc)):
-            if acc[i] == 1:
-                acc_right[i-1] += 1
-
-        # image_file = ann_file.replace('filter_data_3', 'train_ie').replace("txt", 'jpg')
-        image_file = ann_file.replace('new_test_2', 'test_ocr').replace("txt", 'jpg')
+        os.path.join(image_path, os.path.basename(ann_file).replace("txt", 'jpg'))
         if not os.path.exists(image_file):
             continue
 
         image = cv2.imread(image_file)
 
-        # import pdb; pdb.set_trace()
         batch_scores = batch_scores.cpu().softmax(1)
         values, pred = batch_scores.max(1)
 
@@ -258,13 +244,6 @@ def main():
 
         file_name = os.path.basename(image_file)
         cv2.imwrite('./visual_test/{}'.format(file_name), image)
-
-        # import pdb; pdb.set_trace()
-
-    print(len(annotation_list))
-    print(acc_right)
-    for a in acc_right:
-        print(a / len(annotation_list))
 
 if __name__ == '__main__':
     main()

@@ -9,10 +9,7 @@ from torch.utils.data import DataLoader
 import torch.optim as optim
 from sklearn.metrics import confusion_matrix
 
-from model import GATNet
 from gated_gcn import GatedGCNNet
-# from my_gcn import GatedGCNNet
-# from iat_gcn import GatedGCNNet
 
 torch.autograd.set_detect_anomaly(True)
 
@@ -138,8 +135,6 @@ def evaluate_test_network(key, model, device, data_loader, epoch):
             loss = model.loss(batch_scores, batch_labels) 
             
             epoch_test_loss += loss.detach().item()
-            # all_batch_scores.append(batch_scores)
-            # all_batch_labels.append(batch_labels)
             _, _, F1_score = accuracy(batch_scores, batch_labels)
 
             
@@ -158,29 +153,9 @@ def evaluate_test_network(key, model, device, data_loader, epoch):
 
 def write_log(key, msg):
     print(msg)
-    file = "./logs3/{}.log".format(key)
+    file = "./logs/{}.log".format(key)
     with open(file, 'a') as f:
         f.writelines(str(datetime.now()) + ", " + msg + "\n")
-
-def load_gat_net(device, alphabet):
-    net_params = {}
-    net_params['in_dim'] = len(alphabet)
-    net_params['hidden_dim'] = 64
-    net_params['out_dim'] = 64
-    net_params['n_classes'] = 5
-    net_params['n_heads'] = 8
-    net_params['in_feat_dropout'] = 0.1
-    net_params['dropout'] = 0.1
-    net_params['L'] = 5
-    net_params['readout'] = True
-    net_params['graph_norm'] = True
-    net_params['batch_norm'] = True
-    net_params['residual'] = True
-    net_params['device'] = device
-
-    model = GATNet(net_params)
-    model = model.to(device)
-    return model
 
 def load_gate_gcn_net(device, alphabet, checkpoint_path=None):
     net_params = {}
@@ -191,7 +166,7 @@ def load_gate_gcn_net(device, alphabet, checkpoint_path=None):
     net_params['out_dim'] = 512
     net_params['n_classes'] = 5
     net_params['dropout'] = 0.
-    net_params['L'] = 4
+    net_params['L'] = 8
     net_params['readout'] = True
     net_params['graph_norm'] = True
     net_params['batch_norm'] = True
@@ -269,8 +244,6 @@ def main():
 
     for epoch in range(args.epochs):
         epoch_loss, optimizer = train_epoch(model, optimizer, device, train_loader, epoch)
-
-        # evaluate_train_network(args.key, model, device, train2_loader, epoch)
         epoch_test_loss = evaluate_test_network(args.key, model, device, test_loader, epoch)
         # scheduler.step(epoch_test_loss)
 
