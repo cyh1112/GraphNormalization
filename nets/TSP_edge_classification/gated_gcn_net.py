@@ -43,7 +43,7 @@ class GatedGCNNet(nn.Module):
         self.layers.append(self.layer_type(hidden_dim, out_dim, dropout, self.norm, self.residual))
         self.MLP_layer = MLPReadout(2*out_dim, n_classes)
         
-    def forward(self, g, h, e, node_size=None, edge_size=None):
+    def forward(self, g, h, e):
         
         h = self.embedding_h(h.float())
         if not self.edge_feat:
@@ -52,7 +52,7 @@ class GatedGCNNet(nn.Module):
         
         # convnets
         for conv in self.layers:
-            h, e = conv(g, h, e, node_size=node_size, edge_size=edge_size)
+            h, e = conv(g, h, e)
         g.ndata['h'] = h
         
         def _edge_feat(edges):

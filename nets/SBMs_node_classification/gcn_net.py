@@ -39,14 +39,14 @@ class GCNNet(nn.Module):
         self.MLP_layer = MLPReadout(out_dim, n_classes)        
 
 
-    def forward(self, g, h, e, node_size=None, edge_size=None):
+    def forward(self, g, h, e):
         # input embedding
         h = self.embedding_h(h)
         h = self.in_feat_dropout(h)
         
         # GCN
         for conv in self.layers:
-            h = conv(g, h, node_size=node_size, edge_size=edge_size)
+            h = conv(g, h)
 
         # output
         h_out = self.MLP_layer(h)

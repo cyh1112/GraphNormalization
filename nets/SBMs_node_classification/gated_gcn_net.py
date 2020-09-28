@@ -41,7 +41,7 @@ class GatedGCNNet(nn.Module):
         self.MLP_layer = MLPReadout(hidden_dim, n_classes)
         
 
-    def forward(self, g, h, e, h_pos_enc=None, node_size=None, edge_size=None):
+    def forward(self, g, h, e, h_pos_enc=None):
         # input embedding
         h = self.embedding_h(h)
         if self.pos_enc:
@@ -51,7 +51,7 @@ class GatedGCNNet(nn.Module):
         
         # res gated convnets
         for conv in self.layers:
-            h, e = conv(g, h, e, node_size=node_size, edge_size=edge_size)
+            h, e = conv(g, h, e)
 
         # output
         h_out = self.MLP_layer(h)

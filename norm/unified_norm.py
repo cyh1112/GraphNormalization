@@ -19,7 +19,7 @@ class UnifiedNorm(nn.Module):
         self.lambda_node = nn.Parameter(torch.ones(self.num_features))
 
         self.batch_norm = nn.BatchNorm1d(self.num_features, affine=False)
-        self.graph_norm = GraphNorm(self.num_features, affine=False)
+        self.graph_norm = GraphNorm(self.num_features, is_node=is_node, affine=False)
         self.node_norm = nn.LayerNorm(self.num_features, elementwise_affine=False)
         if is_node:
             self.adja_norm = AdjaNodeNorm(self.num_features, affine=False)
@@ -34,9 +34,9 @@ class UnifiedNorm(nn.Module):
                 self.lambda_adja / lambda_sum, \
                 self.lambda_node / lambda_sum
 
-    def forward(self, x, g, graph_size=None):
+    def forward(self, g, x):
         x_b = self.batch_norm(x)
-        x_g = self.graph_norm(x, graph_size)
+        x_g = self.graph_norm(g, x)
         x_a = self.adja_norm(g, x)
         x_n = self.node_norm(x)
 

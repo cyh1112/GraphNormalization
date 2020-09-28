@@ -50,7 +50,7 @@ class GatedGCNLayer(nn.Module):
         h = Ah_i + torch.sum( sigma_ij * Bh_j, dim=1 ) / ( torch.sum( sigma_ij, dim=1 ) + 1e-6 )  # hi = Ahi + sum_j eta_ij/sum_j' eta_ij' * Bhj <= dense attention       
         return {'h' : h}
     
-    def forward(self, g, h, e, node_size=None, edge_size=None):
+    def forward(self, g, h, e):
         
         h_in = h # for residual connection
         e_in = e # for residual connection
@@ -69,8 +69,8 @@ class GatedGCNLayer(nn.Module):
         e = g.edata['e'] # result of graph convolution
 
         if self.norm is not None:
-            normalize(self.bn_node_h, h, g, node_size)
-            normalize(self.bn_node_e, e, g, edge_size)
+            normalize(self.bn_node_h, h, g)
+            normalize(self.bn_node_e, e, g)
         
         h = F.relu(h) # non-linear activation
         e = F.relu(e) # non-linear activation

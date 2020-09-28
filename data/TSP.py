@@ -144,9 +144,7 @@ class TSPDataset(Dataset):
         #snorm_e = torch.cat(tab_snorm_e).sqrt()
         batched_graph = dgl.batch(graphs)
 
-        graph_node_size = [graphs[i].number_of_nodes() for i in range(len(graphs))]
-        graph_eege_size = [graphs[i].number_of_edges() for i in range(len(graphs))]
-        return batched_graph, labels, graph_node_size, graph_eege_size
+        return batched_graph, labels
     
     
     # prepare dense tensors for GNNs using them; such as RingGNN, 3WLGNN

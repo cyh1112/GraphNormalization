@@ -46,7 +46,7 @@ class GatedGCNNet(nn.Module):
         self.layers.append(GatedGCNLayer(hidden_dim, out_dim, dropout, self.norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, 1)   # 1 out dim since regression problem        
         
-    def forward(self, g, h, e, h_pos_enc=None, node_size=None, edge_size=None):
+    def forward(self, g, h, e, h_pos_enc=None):
 
         # input embedding
         h = self.embedding_h(h)
@@ -60,7 +60,7 @@ class GatedGCNNet(nn.Module):
         
         # convnets
         for conv in self.layers:
-            h, e = conv(g, h, e, node_size=node_size, edge_size=edge_size)
+            h, e = conv(g, h, e)
         g.ndata['h'] = h
         
         if self.readout == "sum":

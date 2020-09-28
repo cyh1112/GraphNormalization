@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from dgl.nn.pytorch import GATConv
+from norm.norm import LoadNorm, normalize
 
 """
     GAT: Graph Attention Network
@@ -46,13 +47,13 @@ class GATLayer(nn.Module):
         self.batchnorm_h = LoadNorm(self.norm, out_dim * num_heads, is_node=True)
 
 
-    def forward(self, g, h, node_size=None, edge_size=None):
+    def forward(self, g, h):
         h_in = h # for residual connection
 
         h = self.gatconv(g, h).flatten(1)
             
         if self.norm is not None:
-            normalize(self.batchnorm_h, h, g, node_size)
+            normalize(self.batchnorm_h, h, g)
             
         if self.activation:
             h = self.activation(h)

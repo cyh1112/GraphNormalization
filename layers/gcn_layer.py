@@ -4,6 +4,7 @@ import torch.nn.functional as F
 
 import dgl.function as fn
 from dgl.nn.pytorch import GraphConv
+from norm.norm import LoadNorm, normalize
 
 """
     GCN: Graph Convolutional Networks
@@ -54,7 +55,7 @@ class GCNLayer(nn.Module):
             self.conv = GraphConv(in_dim, out_dim)
 
         
-    def forward(self, g, feature, node_size=None, edge_size=None):
+    def forward(self, g, feature):
         h_in = feature   # to be used for residual connection
 
         if self.dgl_builtin == False:
@@ -66,7 +67,7 @@ class GCNLayer(nn.Module):
             h = self.conv(g, feature)
         
         if self.norm is not None:
-            normalize(self.batchnorm_h, h, g, node_size)
+            normalize(self.batchnorm_h, h, g)
        
         if self.activation:
             h = self.activation(h)

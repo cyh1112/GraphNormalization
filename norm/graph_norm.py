@@ -6,11 +6,12 @@ class GraphNorm(nn.Module):
     """
         Param: []
     """
-    def __init__(self, num_features, eps=1e-5, affine=True):
+    def __init__(self, num_features, eps=1e-5, affine=True, is_node=True):
         super().__init__()
         self.eps = eps
         self.num_features = num_features
         self.affine = affine
+        self.is_node = is_node
 
         if self.affine:
             self.gamma = nn.Parameter(torch.ones(self.num_features))
@@ -25,7 +26,8 @@ class GraphNorm(nn.Module):
         x = (x - mean) / (var + self.eps)
         return x
 
-    def forward(self, x, graph_size):
+    def forward(self, g, x):
+        graph_size  = g.batch_num_nodes if self.is_node else g.batch_num_edges
         x_list = torch.split(x, graph_size)
         norm_list = []
         for x in x_list:

@@ -20,7 +20,7 @@ def train_epoch_sparse(model, optimizer, device, data_loader, epoch):
     epoch_train_acc = 0
     nb_data = 0
     gpu_mem = 0
-    for iter, (batch_graphs, batch_labels, batch_node_size, batch_edge_size) in enumerate(data_loader):
+    for iter, (batch_graphs, batch_labels) in enumerate(data_loader):
         batch_x = batch_graphs.ndata['feat'].to(device)  # num x feat
         batch_e = batch_graphs.edata['feat'].to(device)
         batch_labels = batch_labels.to(device)
@@ -30,9 +30,9 @@ def train_epoch_sparse(model, optimizer, device, data_loader, epoch):
             sign_flip = torch.rand(batch_pos_enc.size(1)).to(device)
             sign_flip[sign_flip>=0.5] = 1.0; sign_flip[sign_flip<0.5] = -1.0
             batch_pos_enc = batch_pos_enc * sign_flip.unsqueeze(0)
-            batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_pos_enc, batch_node_size, batch_edge_size)
+            batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_pos_enc)
         except:
-            batch_scores = model.forward(batch_graphs, batch_x, batch_e, node_size=batch_node_size, edge_size=batch_edge_size)
+            batch_scores = model.forward(batch_graphs, batch_x, batch_e)
         loss = model.loss(batch_scores, batch_labels)
         loss.backward()
         optimizer.step()
@@ -51,15 +51,15 @@ def evaluate_network_sparse(model, device, data_loader, epoch):
     epoch_test_acc = 0
     nb_data = 0
     with torch.no_grad():
-        for iter, (batch_graphs, batch_labels, batch_node_size, batch_edge_size) in enumerate(data_loader):
+        for iter, (batch_graphs, batch_labels) in enumerate(data_loader):
             batch_x = batch_graphs.ndata['feat'].to(device)
             batch_e = batch_graphs.edata['feat'].to(device)
             batch_labels = batch_labels.to(device)
             try:
                 batch_pos_enc = batch_graphs.ndata['pos_enc'].to(device)
-                batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_pos_enc, batch_node_size, batch_edge_size)
+                batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_pos_enc)
             except:
-                batch_scores = model.forward(batch_graphs, batch_x, batch_e, node_size=batch_node_size, edge_size=batch_edge_size)
+                batch_scores = model.forward(batch_graphs, batch_x, batch_e)
             loss = model.loss(batch_scores, batch_labels) 
             epoch_test_loss += loss.detach().item()
             epoch_test_acc += accuracy(batch_scores, batch_labels)

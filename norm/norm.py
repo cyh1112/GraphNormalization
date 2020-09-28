@@ -20,7 +20,7 @@ def LoadNorm(NORM_NAME, num_features, is_node=True):
         return nn.LayerNorm(num_features)
 
     if NORM_NAME == 'GraphNorm':
-        return GraphNorm(num_features)
+        return GraphNorm(num_features, is_node=is_node)
 
     if NORM_NAME == 'AdjancehNorm':
         if is_node:
@@ -31,16 +31,9 @@ def LoadNorm(NORM_NAME, num_features, is_node=True):
     if NORM_NAME == 'UnifiedNorm':
         return UnifiedNorm(num_features, is_node)
 
-def normalize(norm, x, g, size):
+def normalize(norm, x, g):
     if isinstance(norm, nn.BatchNorm1d) or isinstance(norm, nn.LayerNorm):
         return norm(x)
 
-    if isinstance(norm, GraphNorm):
-        return norm(x, size)    
-
-    if isinstance(norm, AdjaNodeNorm) or isinstance(norm, AdjaEdgeNorm):
-        return norm(x, g)    
-
-    if isinstance(norm, UnifiedNorm):
-        return norm(x, g, size)    
-        
+    if isinstance(norm, GraphNorm) or isinstance(norm, AdjaNodeNorm) or isinstance(norm, AdjaEdgeNorm) or isinstance(norm, UnifiedNorm):
+        return norm(g, x)    

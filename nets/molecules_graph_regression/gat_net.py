@@ -38,11 +38,11 @@ class GATNet(nn.Module):
                                     dropout, self.norm, self.residual))
         self.MLP_layer = MLPReadout(out_dim, 1)   # 1 out dim since regression problem
         
-    def forward(self, g, h, e, node_size=None, edge_size=None):
+    def forward(self, g, h, e):
         h = self.embedding_h(h)
         h = self.in_feat_dropout(h)
         for conv in self.layers:
-            h = conv(g, h, node_size=node_size, edge_size=edge_size)
+            h = conv(g, h)
         g.ndata['h'] = h
         
         if self.readout == "sum":
