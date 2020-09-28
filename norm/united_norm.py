@@ -3,12 +3,11 @@ import torch
 from norm.graph_norm import GraphNorm
 from norm.adjance_norm import AdjaNodeNorm, AdjaEdgeNorm
 
-class UnifiedNorm(nn.Module):
+class UnitedNormBase(nn.Module):
 
     def __init__(self, num_features, is_node=True):
-
-        super(UnifiedNorm, self).__init__()
-
+        super(UnitedNormBase, self).__init__()
+        self.clamp = False
         self.num_features = num_features
         self.gamma = nn.Parameter(torch.ones(self.num_features))
         self.beta = nn.Parameter(torch.zeros(self.num_features))
@@ -27,12 +26,7 @@ class UnifiedNorm(nn.Module):
             self.adja_norm = AdjaEdgeNorm(self.num_features, affine=False)
 
     def norm_lambda(self):
-        lambda_sum = self.lambda_batch + self.lambda_graph + self.lambda_adja + self.lambda_node
-
-        return self.lambda_batch / lambda_sum, \
-                self.lambda_graph / lambda_sum, \
-                self.lambda_adja / lambda_sum, \
-                self.lambda_node / lambda_sum
+        raise NotImplementedError
 
     def forward(self, g, x):
         x_b = self.batch_norm(x)
