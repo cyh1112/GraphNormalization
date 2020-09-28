@@ -8,6 +8,16 @@
 
 <img src="./docs/graph_norm.png" align="center" width="750"/>
 
+## Updates
+
+**Sep 28, 2020**
+
+- add Softmax United Norm
+
+**Sep 24, 2020**
+
+- First release of the project.
+
 ## 1. Benchmark initialization
 
 [Follow these instructions](https://github.com/cyh1112/GraphNormalization/blob/master/docs/01_benchmark_installation.md) to install the benchmark and setup the environment.
@@ -39,7 +49,7 @@ python main_SBMs_node_classification.py --dataset CLUSTER --gpu_id 3 --seed 41 -
 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_100k.json' --norm GraphNorm
 ```
 
-The choices of `norm` consist of "NodeNorm", "AdjanceNorm", "GraphNorm", "BatchNorm", "UnifiedNorm"
+The choices of `norm` consist of "NodeNorm", "AdjanceNorm", "GraphNorm", "BatchNorm", "UnitedNorm","UnitedNormSoftmax"
 
 ## 4. SROIE
 
