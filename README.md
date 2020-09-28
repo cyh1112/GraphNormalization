@@ -36,7 +36,7 @@ Graph-wise Normalization: [graph_norm.py](https://github.com/cyh1112/GraphNormal
 
 Batch-wise normalization: equivalent to [Batch Normalization](https://arxiv.org/pdf/1502.03167.pdf)
 
-United Normalization:  [united_norm.py](https://github.com/cyh1112/GraphNormalization/blob/master/norm/unified_norm.py)
+United Normalization:  [united_norm.py](https://github.com/cyh1112/GraphNormalization/blob/master/norm/united_norm_common.py)
 
 ## 3. Usage
 
