@@ -69,8 +69,8 @@ class GatedGCNLayer(nn.Module):
         e = g.edata['e'] # result of graph convolution
 
         if self.norm is not None:
-            normalize(self.bn_node_h, h, g)
-            normalize(self.bn_node_e, e, g)
+            h = normalize(self.bn_node_h, h, g)
+            e = normalize(self.bn_node_e, e, g)
         
         h = F.relu(h) # non-linear activation
         e = F.relu(e) # non-linear activation
@@ -100,12 +100,12 @@ class GatedGCNLayerEdgeFeatOnly(nn.Module):
     """
         Param: []
     """
-    def __init__(self, input_dim, output_dim, dropout, batch_norm, residual=False):
+    def __init__(self, input_dim, output_dim, dropout, norm, residual=False):
         super().__init__()
         self.in_channels = input_dim
         self.out_channels = output_dim
         self.dropout = dropout
-        self.batch_norm = batch_norm
+        self.norm = norm
         self.residual = residual
         
         if input_dim != output_dim:
@@ -115,7 +115,7 @@ class GatedGCNLayerEdgeFeatOnly(nn.Module):
         self.B = nn.Linear(input_dim, output_dim, bias=True)
         self.D = nn.Linear(input_dim, output_dim, bias=True)
         self.E = nn.Linear(input_dim, output_dim, bias=True)
-        self.bn_node_h = nn.BatchNorm1d(output_dim)
+        self.bn_node_h = LoadNorm(self.norm, output_dim, is_node=True)
 
     def message_func(self, edges):
         Bh_j = edges.src['Bh']    
@@ -143,8 +143,8 @@ class GatedGCNLayerEdgeFeatOnly(nn.Module):
         g.update_all(self.message_func,self.reduce_func) 
         h = g.ndata['h'] # result of graph convolution
         
-        if self.batch_norm:
-            h = self.bn_node_h(h) # batch normalization    
+        if self.norm is not None:
+            h = normalize(self.bn_node_h, h, g)
         
         h = F.relu(h) # non-linear activation
         
@@ -168,12 +168,12 @@ class GatedGCNLayerIsotropic(nn.Module):
     """
         Param: []
     """
-    def __init__(self, input_dim, output_dim, dropout, batch_norm, residual=False):
+    def __init__(self, input_dim, output_dim, dropout, norm, residual=False):
         super().__init__()
         self.in_channels = input_dim
         self.out_channels = output_dim
         self.dropout = dropout
-        self.batch_norm = batch_norm
+        self.norm = norm
         self.residual = residual
         
         if input_dim != output_dim:
@@ -181,7 +181,7 @@ class GatedGCNLayerIsotropic(nn.Module):
         
         self.A = nn.Linear(input_dim, output_dim, bias=True)
         self.B = nn.Linear(input_dim, output_dim, bias=True)
-        self.bn_node_h = nn.BatchNorm1d(output_dim)
+        self.bn_node_h = LoadNorm(self.norm, output_dim, is_node=True)
 
     def message_func(self, edges):
         Bh_j = edges.src['Bh']
@@ -203,8 +203,8 @@ class GatedGCNLayerIsotropic(nn.Module):
         g.update_all(self.message_func,self.reduce_func) 
         h = g.ndata['h'] # result of graph convolution
         
-        if self.batch_norm:
-            h = self.bn_node_h(h) # batch normalization    
+        if self.norm is not None:
+            h = normalize(self.bn_node_h, h, g)
         
         h = F.relu(h) # non-linear activation
         

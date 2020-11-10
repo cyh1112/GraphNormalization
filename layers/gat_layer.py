@@ -53,7 +53,7 @@ class GATLayer(nn.Module):
         h = self.gatconv(g, h).flatten(1)
             
         if self.norm is not None:
-            normalize(self.batchnorm_h, h, g)
+            h = normalize(self.batchnorm_h, h, g)
             
         if self.activation:
             h = self.activation(h)
@@ -72,14 +72,14 @@ class GATLayer(nn.Module):
 
 
 class CustomGATHeadLayer(nn.Module):
-    def __init__(self, in_dim, out_dim, dropout, batch_norm):
+    def __init__(self, in_dim, out_dim, dropout, norm):
         super().__init__()
         self.dropout = dropout
-        self.batch_norm = batch_norm
+        self.norm = norm
         
         self.fc = nn.Linear(in_dim, out_dim, bias=False)
         self.attn_fc = nn.Linear(2 * out_dim, 1, bias=False)
-        self.batchnorm_h = nn.BatchNorm1d(out_dim)
+        self.batchnorm_h = LoadNorm(self.norm, out_dim, is_node=True)
 
     def edge_attention(self, edges):
         z2 = torch.cat([edges.src['z'], edges.dst['z']], dim=1)
@@ -102,8 +102,8 @@ class CustomGATHeadLayer(nn.Module):
         g.update_all(self.message_func, self.reduce_func)
         h = g.ndata['h']
         
-        if self.batch_norm:
-            h = self.batchnorm_h(h)
+        if self.norm is not None:
+            h = normalize(self.batchnorm_h, h, g)
         
         h = F.elu(h)
         
@@ -116,7 +116,7 @@ class CustomGATLayer(nn.Module):
     """
         Param: [in_dim, out_dim, n_heads]
     """
-    def __init__(self, in_dim, out_dim, num_heads, dropout, batch_norm, residual=True):
+    def __init__(self, in_dim, out_dim, num_heads, dropout, norm, residual=True):
         super().__init__()
 
         self.in_channels = in_dim
@@ -129,7 +129,7 @@ class CustomGATLayer(nn.Module):
 
         self.heads = nn.ModuleList()
         for i in range(num_heads):
-            self.heads.append(CustomGATHeadLayer(in_dim, out_dim, dropout, batch_norm))
+            self.heads.append(CustomGATHeadLayer(in_dim, out_dim, dropout, norm))
         self.merge = 'cat' 
 
     def forward(self, g, h, e):
@@ -157,17 +157,17 @@ class CustomGATLayer(nn.Module):
 
 
 class CustomGATHeadLayerEdgeReprFeat(nn.Module):
-    def __init__(self, in_dim, out_dim, dropout, batch_norm):
+    def __init__(self, in_dim, out_dim, dropout, norm):
         super().__init__()
         self.dropout = dropout
-        self.batch_norm = batch_norm
+        self.norm = norm
         
         self.fc_h = nn.Linear(in_dim, out_dim, bias=False)
         self.fc_e = nn.Linear(in_dim, out_dim, bias=False)
         self.fc_proj = nn.Linear(3* out_dim, out_dim)
         self.attn_fc = nn.Linear(3* out_dim, 1, bias=False)
-        self.batchnorm_h = nn.BatchNorm1d(out_dim)
-        self.batchnorm_e = nn.BatchNorm1d(out_dim)
+        self.batchnorm_h = LoadNorm(self.norm, out_dim, is_node=True)
+        self.batchnorm_e = LoadNorm(self.norm, out_dim, is_node=False)
 
     def edge_attention(self, edges):
         z = torch.cat([edges.data['z_e'], edges.src['z_h'], edges.dst['z_h']], dim=1)
@@ -196,9 +196,9 @@ class CustomGATHeadLayerEdgeReprFeat(nn.Module):
         h = g.ndata['h']
         e = g.edata['e_proj']
         
-        if self.batch_norm:
-            h = self.batchnorm_h(h)
-            e = self.batchnorm_e(e)
+        if self.norm is not None:
+            h = normalize(self.batchnorm_h, h, g)
+            e = normalize(self.batchnorm_e, e, g)
         
         h = F.elu(h)
         e = F.elu(e)
@@ -213,7 +213,7 @@ class CustomGATLayerEdgeReprFeat(nn.Module):
     """
         Param: [in_dim, out_dim, n_heads]
     """
-    def __init__(self, in_dim, out_dim, num_heads, dropout, batch_norm, residual=True):
+    def __init__(self, in_dim, out_dim, num_heads, dropout, norm, residual=True):
         super().__init__()
 
         self.in_channels = in_dim
@@ -226,7 +226,7 @@ class CustomGATLayerEdgeReprFeat(nn.Module):
 
         self.heads = nn.ModuleList()
         for i in range(num_heads):
-            self.heads.append(CustomGATHeadLayerEdgeReprFeat(in_dim, out_dim, dropout, batch_norm))
+            self.heads.append(CustomGATHeadLayerEdgeReprFeat(in_dim, out_dim, dropout, norm))
         self.merge = 'cat' 
 
     def forward(self, g, h, e):
@@ -262,13 +262,13 @@ class CustomGATLayerEdgeReprFeat(nn.Module):
 
 
 class CustomGATHeadLayerIsotropic(nn.Module):
-    def __init__(self, in_dim, out_dim, dropout, batch_norm):
+    def __init__(self, in_dim, out_dim, dropout, norm):
         super().__init__()
         self.dropout = dropout
-        self.batch_norm = batch_norm
+        self.norm = norm
         
         self.fc = nn.Linear(in_dim, out_dim, bias=False)
-        self.batchnorm_h = nn.BatchNorm1d(out_dim)
+        self.batchnorm_h = LoadNorm(self.norm, out_dim, is_node=True)
 
     def message_func(self, edges):
         return {'z': edges.src['z']}
@@ -283,8 +283,8 @@ class CustomGATHeadLayerIsotropic(nn.Module):
         g.update_all(self.message_func, self.reduce_func)
         h = g.ndata['h']
         
-        if self.batch_norm:
-            h = self.batchnorm_h(h)
+        if self.norm is not None:
+            h = normalize(self.batchnorm_h, h, g)
         
         h = F.elu(h)
         
@@ -297,7 +297,7 @@ class CustomGATLayerIsotropic(nn.Module):
     """
         Param: [in_dim, out_dim, n_heads]
     """
-    def __init__(self, in_dim, out_dim, num_heads, dropout, batch_norm, residual=True):
+    def __init__(self, in_dim, out_dim, num_heads, dropout, norm, residual=True):
         super().__init__()
 
         self.in_channels = in_dim
@@ -310,7 +310,7 @@ class CustomGATLayerIsotropic(nn.Module):
 
         self.heads = nn.ModuleList()
         for i in range(num_heads):
-            self.heads.append(CustomGATHeadLayerIsotropic(in_dim, out_dim, dropout, batch_norm))
+            self.heads.append(CustomGATHeadLayerIsotropic(in_dim, out_dim, dropout, norm))
         self.merge = 'cat' 
 
     def forward(self, g, h, e):

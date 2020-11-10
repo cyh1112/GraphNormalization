@@ -67,7 +67,7 @@ class GCNLayer(nn.Module):
             h = self.conv(g, feature)
         
         if self.norm is not None:
-            normalize(self.batchnorm_h, h, g)
+            h = normalize(self.batchnorm_h, h, g)
        
         if self.activation:
             h = self.activation(h)
