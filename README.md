@@ -8,6 +8,16 @@
 
 <img src="./docs/graph_norm.png" align="center" width="750"/>
 
+## Updates
+
+**Sep 28, 2020**
+
+- add Softmax United Norm
+
+**Sep 24, 2020**
+
+- First release of the project.
+
 ## 1. Benchmark initialization
 
 [Follow these instructions](https://github.com/cyh1112/GraphNormalization/blob/master/docs/01_benchmark_installation.md) to install the benchmark and setup the environment.
@@ -26,7 +36,7 @@ Graph-wise Normalization: [graph_norm.py](https://github.com/cyh1112/GraphNormal
 
 Batch-wise normalization: equivalent to [Batch Normalization](https://arxiv.org/pdf/1502.03167.pdf)
 
-United Normalization:  [united_norm.py](https://github.com/cyh1112/GraphNormalization/blob/master/norm/unified_norm.py)
+United Normalization:  [united_norm.py](https://github.com/cyh1112/GraphNormalization/blob/master/norm/united_norm_common.py)
 
 ## 3. Usage
 
@@ -39,7 +49,7 @@ python main_SBMs_node_classification.py --dataset CLUSTER --gpu_id 3 --seed 41 -
 'configs/SBMs_node_clustering_GatedGCN_CLUSTER_100k.json' --norm GraphNorm
 ```
 
-The choices of `norm` consist of "NodeNorm", "AdjanceNorm", "GraphNorm", "BatchNorm", "UnifiedNorm"
+The choices of `norm` consist of "NodeNorm", "AdjanceNorm", "GraphNorm", "BatchNorm", "UnitedNorm","UnitedNormSoftmax"
 
 ## 4. SROIE
 
@@ -51,7 +61,7 @@ For a receipt, each text bbox can be viewed as a node of a graph. Its positions,
 
 #### Dataset
 
-SROIE Dataset Download: [Dropbox](https://www.dropbox.com/s/v1aywni6ch135nb/sroie.tar.gz?dl=0), [BaiduPan: 79zj](https://pan.baidu.com/s/1bGV5wshK2ixFdlDolTzBkA)
+SROIE Dataset Download: [Dropbox](https://www.dropbox.com/s/v1aywni6ch135nb/sroie.tar.gz?dl=0), [BaiduPan: u4tm](https://pan.baidu.com/s/1owQJsZ1EjKqk3D65sX6SQg)
 
 #### Train
 
